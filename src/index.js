@@ -1,17 +1,19 @@
 'use strict';
 
 ///
-/// Usage:
-///   let nFlux = require('nenya-flux');
+/// Usage:u
+///   let nFlux = require('nenya-flux')();
 ///   let storeSubscription = nFlux.createSubscription(store);
 ///   let myAction = nFlux.createAction(action);
 /// 
 
 let NDispatcher = require('./dispatcher.mod');
+let NStore = require('./store.mod');
 let _dispatcher = NDispatcher();
 
 module.exports = () => {
   return {
+    store: NStore,
     createAction,
     createSubscription
   }
