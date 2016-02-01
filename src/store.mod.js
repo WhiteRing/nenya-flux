@@ -1,7 +1,7 @@
 "use strict";
 
 let _state       = {};
-let _actions     = [];
+let _actions     = {};
 let _subscribers = [];
 
 module.exports = (initialState) => {
@@ -13,8 +13,11 @@ module.exports = (initialState) => {
     getState,
     subscribe,
     update,
-    updateSubscribers
+    updateSubscribers,
+    actions
   };
+
+
 };
 
 
@@ -31,10 +34,14 @@ function addAction (actionType, method) {
 
 function hasAction (actionType) { return typeof _actions[actionType] !== 'undefined'; }
 
-function getState () { return JSON.parse(JSON.stringify(_state)); }
+function getState () { 
+// return JSON.parse(JSON.stringify(_state)); 
+ return _state;
+}
 
-function subscribe (subscribers) {
-  _subscribers = _subscribers.concat(subscribers);
+function subscribe (subscriber) {
+//  _subscribers = _subscribers.concat(subscribers);
+  _subscribers[_subscribers.length] = subscriber;
 }
 
 function update (actionType, payload) {
@@ -45,21 +52,24 @@ function update (actionType, payload) {
   let currentState  = getState();
   let currentAction = _actions[actionType];
 
-  currentAction(currentState, payload);
+  let newState = currentAction(currentState, payload);
 
   // TODO: use imutable states ?
   
-  _state = currentState;
-  
-  updateSubscribers();
+  _state = newState ? newState : currentState;
+
+  this.updateSubscribers();
 }
 
-
-
 function updateSubscribers () {
+  let self = this;
   _subscribers.forEach(function (subscriber) { 
-    subscriber(this);
+    subscriber(self);
   });
+}
+
+function actions () {
+  return Object.keys(_actions);
 }
 
 /* 

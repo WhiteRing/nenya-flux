@@ -2,8 +2,7 @@
 
 let NenyaFlux = require('../src');
 let nFlux = NenyaFlux();
-let CounterStore = require('./stores/store.test');
-let cs = CounterStore();
+let cs = require('./stores/store.test')();
 let counterSubscription = nFlux.createSubscription(cs);
 
 console.log("--- Test NenyaFlux ---");

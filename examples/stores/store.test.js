@@ -1,19 +1,21 @@
 "use strict";
 
-let NStore = require('../../src/store.mod');
+let NStore = require('../../src/store.class');
 
 let initialState = { counter: 0 };
 
+
+
 module.exports = () => {
-  let nStore = {};
+  let counterStore = new NStore(initialState);
 
-  nStore.__proto__ = NStore (initialState);
+  counterStore.addAction('inc', inc);
+  counterStore.addAction('dec', dec);
 
-  nStore.addAction('inc', inc);
-  nStore.addAction('dec', dec);
-
-  return nStore;
+  return counterStore;
 }
+
+
 
 function inc (state, payload) {
   state.counter += payload;
@@ -22,3 +24,4 @@ function inc (state, payload) {
 function dec (state, payload) {
   state.counter -= payload;
 }
+
