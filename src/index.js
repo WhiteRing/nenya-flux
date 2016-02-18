@@ -12,14 +12,22 @@ let NDispatcher = require('./dispatcher.mod');
 let NenyaStore = require('./store.class');
 
 let _dispatcher = NDispatcher();
+var _nFlux = null;
 
 module.exports = () => {
-  return {
-    createStore,
-    createAction,
-    createSubscription
+  if (_nFlux === null) {
+    _nFlux = {
+      createStore,
+      createAction,
+      createSubscription,
+      reset,
+      NenyaStore
+    }
+
   }
-};
+
+  return _nFlux;
+}
 
 
 
@@ -28,7 +36,7 @@ function createStore (initialState) {
 }
 
 function createAction (actionType) {
-  validateAction(actionType);
+  _validateAction(actionType);
   
   return (payload) => {
     _dispatcher.dispatch(actionType, payload);
@@ -38,12 +46,18 @@ function createAction (actionType) {
 function createSubscription(nStore) {
   nStore = typeof nStore === 'function' ? nStore() : nStore;
 
-  validateStore(nStore);
+  _validateStore(nStore);
 
   return _dispatcher.register(nStore);
 }
 
-function validateStore(nStore) {
+function reset () {
+  _dispatcher.reset();
+}
+
+
+
+function _validateStore(nStore) {
   if (typeof nStore === 'undefined') {
     throw new Error('No store to register.');
   }
@@ -53,7 +67,7 @@ function validateStore(nStore) {
   } 
 }
 
-function validateAction(actionType) {
+function _validateAction(actionType) {
   if (!actionType || typeof actionType !== 'string') {
     throw new Error('Please provide a type for the new action to create.');
   }  

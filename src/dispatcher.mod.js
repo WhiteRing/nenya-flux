@@ -7,6 +7,7 @@ let _stores = [];
 module.exports = () => {
   return {
     register,
+    reset,
     dispatch
   };
 };
@@ -20,13 +21,47 @@ function register (nStore) {
 
   _stores[_stores.length] = nStore;
   
-  return (subscriber, initializeSubscriber) => {
+  return (subscriber, actionsToSubscribe, initializeSubscriber) => {
+    actionsToSubscribe = typeof actionsToSubscribe === 'undefined' ? [] : 
+    actionsToSubscribe.constructor === Array ? actionsToSubscribe : [actionsToSubscribe];
+        
     if (initializeSubscriber) { 
       subscriber(nStore);
     }
-    
-    nStore.subscribe(subscriber);
+        
+    nStore.subscribe(subscriber, actionsToSubscribe);
   }
+}
+
+function reset (type) {
+  if (typeof type === 'undefined') {
+    _stores.forEach((store) => {
+      store.resetActions();
+      store.resetSubscribers();
+      store.resetState();
+    });
+    
+    return;
+  }
+  
+  if (type === 'flush') {
+    _stores = [];
+    return;
+  }  
+  
+  _stores.forEach((store) => {
+    switch (type) {
+      case 'actions': 
+        store.resetActions();
+        break;
+      case 'subscribers': 
+        store.resetSubscribers();
+        break;
+      case 'state': 
+        store.resetState();
+        break;
+    }
+  });
 }
 
 function dispatch (action, payload) {
